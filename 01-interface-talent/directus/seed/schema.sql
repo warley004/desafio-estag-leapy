@@ -10,8 +10,8 @@ create table if not exists public.internship_leaders (
   user_id uuid not null,
   position character varying(255) null,
   department character varying(255) null,
-  constraint internship_leaders_pkey primary key (id),
-  constraint internship_leaders_user_id_foreign foreign key (user_id) references directus_users (id)
+  constraint internship_leaders_pkey primary key (id)
+  -- constraint internship_leaders_user_id_foreign foreign key (user_id) references directus_users (id)
 ) tablespace pg_default;
 
 create index if not exists internship_leaders_status_idx on public.internship_leaders using btree (status) tablespace pg_default;
@@ -45,10 +45,12 @@ create table if not exists public.talents (
   constraint talents_pkey primary key (id),
   constraint talents_phone_number_unique unique (phone_number),
   constraint talents_user_id_unique unique (user_id),
-  constraint talents_leader_id_foreign foreign key (leader_id) references internship_leaders (id) on delete set null,
-  constraint talents_target_role_id_foreign foreign key (target_role_id) references target_roles (id) on delete set null,
-  constraint talents_user_id_foreign foreign key (user_id) references directus_users (id)
+  constraint talents_leader_id_foreign foreign key (leader_id) references internship_leaders (id) on delete set null
+  -- As FKs abaixo dependem de tabelas que ainda não existem na hora do schema.
+  -- constraint talents_target_role_id_foreign foreign key (target_role_id) references target_roles (id) on delete set null,
+  -- constraint talents_user_id_foreign foreign key (user_id) references directus_users (id)
 ) tablespace pg_default;
+
 
 create index if not exists talents_user_id_idx on public.talents using btree (user_id) tablespace pg_default;
 create index if not exists talents_department_idx on public.talents using btree (department) tablespace pg_default;
