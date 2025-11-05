@@ -12,23 +12,37 @@ export type Talent = {
 
 export type TalentWithUser = Talent & {
   user_email?: string | null;
+  user_first_name?: string | null;
+  user_last_name?: string | null;
+  user_full_name?: string | null;
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
-const TOKEN = process.env.NEXT_PUBLIC_DIRECTUS_TOKEN!;
+const TOKEN =
+  process.env.NEXT_PUBLIC_DIRECTUS_TOKEN ??
+  process.env.NEXT_PUBLIC_DIRECTUS_STATIC_TOKEN ??
+  "";
 
-const defaultHeaders = {
+const defaultHeaders: HeadersInit = {
   Authorization: `Bearer ${TOKEN}`,
+};
+
+// ---------- Helpers de usuários ----------
+
+type UserInfo = {
+  email: string | null;
+  first_name: string | null;
+  last_name: string | null;
 };
 
 async function fetchUsersByIds(
   ids: string[]
-): Promise<Record<string, string | null>> {
+): Promise<Record<string, UserInfo>> {
   if (!ids.length) return {};
 
   const params = new URLSearchParams();
   params.set("filter[id][_in]", ids.join(","));
-  params.set("fields", "id,email");
+  params.set("fields", "id,email,first_name,last_name");
   params.set("limit", String(ids.length));
 
   const res = await fetch(`${BASE_URL}/users?${params.toString()}`, {
@@ -43,15 +57,21 @@ async function fetchUsersByIds(
 
   const json = await res.json();
 
-  const map: Record<string, string | null> = {};
+  const map: Record<string, UserInfo> = {};
   if (Array.isArray(json.data)) {
     for (const user of json.data) {
-      map[user.id] = user.email ?? null;
+      map[user.id] = {
+        email: user.email ?? null,
+        first_name: user.first_name ?? null,
+        last_name: user.last_name ?? null,
+      };
     }
   }
 
   return map;
 }
+
+// ---------- Talents + join com users ----------
 
 type FetchTalentsParams = {
   page?: number;
@@ -91,14 +111,29 @@ export async function fetchTalentsPage(
     new Set(talents.map((t) => t.user_id).filter(Boolean))
   );
 
-  // busca emails desses users
+  // busca infos dos usuários
   const usersMap = await fetchUsersByIds(userIds);
 
-  // monta array enriquecido
-  const enriched: TalentWithUser[] = talents.map((t) => ({
-    ...t,
-    user_email: usersMap[t.user_id] ?? null,
-  }));
+  // monta array enriquecido com nome + email
+  const enriched: TalentWithUser[] = talents.map((t) => {
+    const user = usersMap[t.user_id];
+
+    const first = user?.first_name ?? null;
+    const last = user?.last_name ?? null;
+    const fullNameRaw = `${first ?? ""} ${last ?? ""}`.trim();
+    const fullName =
+      fullNameRaw.length > 0
+        ? fullNameRaw
+        : user?.email ?? null;
+
+    return {
+      ...t,
+      user_email: user?.email ?? null,
+      user_first_name: first,
+      user_last_name: last,
+      user_full_name: fullName,
+    };
+  });
 
   return { talents: enriched, total };
 }
