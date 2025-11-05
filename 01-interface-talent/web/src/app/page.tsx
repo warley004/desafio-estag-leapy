@@ -1,43 +1,33 @@
+// src/app/page.tsx
 import { fetchTalentsPage } from "@/lib/directus";
+import TalentCard from "@/components/TalentCard";
 
 export default async function Page() {
   const { talents, total } = await fetchTalentsPage({ page: 1, limit: 10 });
 
   return (
-    <main className="min-h-screen bg-zinc-50 p-10 text-gray-900">
-      <h1 className="text-2xl font-bold mb-2">Lista de Talentos</h1>
-      <p className="text-sm text-gray-600 mb-6">
-        Total de talentos: <strong>{total}</strong>
-      </p>
+    <section>
+      <header className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-2xl font-semibold">Talentos</h1>
+          <p className="text-gray-400 text-sm">
+            {total} resultados encontrados
+          </p>
+        </div>
+        <input
+          type="text"
+          placeholder="Buscar por e-mail"
+          className="bg-[#1b1d21] border border-gray-700 rounded-md px-3 py-2 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-violet-500"
+        />
+      </header>
 
-      {!talents.length ? (
-        <p className="text-gray-500">Nenhum talento encontrado.</p>
-      ) : (
-        <ul className="space-y-3">
-          {talents.map((t) => (
-            <li
-              key={t.id}
-              className="p-4 border rounded bg-white shadow-sm hover:shadow transition"
-            >
-              <p>
-                <strong>Email:</strong>{" "}
-                {t.user_email || "Sem email (user órfão)"}
-              </p>
-              <p>
-                <strong>User ID:</strong> {t.user_id}
-              </p>
-              <p>
-                <strong>Departamento:</strong>{" "}
-                {t.department || "Não informado"}
-              </p>
-              <p>
-                <strong>Status:</strong>{" "}
-                {t.current_status || "Não informado"}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+      <div className="grid grid-cols-2 gap-6">
+        {talents.map((t) => (
+          <TalentCard key={t.id} talent={t} />
+        ))}
+      </div>
+
+      <footer className="mt-8 text-gray-500 text-sm">Página 1 de 10</footer>
+    </section>
   );
 }
