@@ -12,6 +12,8 @@ export type Talent = {
   date_updated?: string | null;
   leader_id?: number | null;
   target_role_id?: number | null;
+  start_date?: string | null;
+  end_date?: string | null;
 };
 
 export type TalentWithUser = Talent & {
