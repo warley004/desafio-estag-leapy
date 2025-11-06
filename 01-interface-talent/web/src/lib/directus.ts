@@ -192,6 +192,7 @@ export async function fetchTalentsPage(
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("limit", String(limit));
+  params.set("meta", "filter_count");
 
     // Se tiver busca por e-mail, primeiro descobrimos os user_ids
   let userIdsFilter: string[] | null = null;
@@ -263,7 +264,7 @@ export async function fetchTalentsPage(
 
   const json = await res.json();
   const talents: Talent[] = Array.isArray(json.data) ? json.data : [];
-  const total: number = json.meta?.total ?? talents.length;
+  const total: number = json.meta?.filter_count ?? talents.length;
 
   // IDs únicos de leaders e roles
   const leaderIds = Array.from(
