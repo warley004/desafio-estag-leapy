@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { fetchTalentsPage } from "@/lib/directus";
 import TalentCard from "@/components/TalentCard";
+import EmailSearchInput from "@/components/EmailSearchInput";
 
 export default async function Page({
   searchParams,
@@ -119,41 +120,9 @@ export default async function Page({
           </p>
         </div>
 
-        {/* form SÓ da busca, filtros vêm da sidebar */}
-                <form className="w-full md:w-72" action="/" method="GET">
-          <input type="hidden" name="department" value={department ?? ""} />
-          <input type="hidden" name="status" value={status ?? ""} />
-          <input
-            type="hidden"
-            name="orchestrator"
-            value={orchestratorState ?? ""}
-          />
-          <input type="hidden" name="pdi" value={pdiReady ? "true" : ""} />
-          <input
-            type="hidden"
-            name="leader"
-            value={leaderId != null ? String(leaderId) : ""}
-          />
-          <input
-            type="hidden"
-            name="role"
-            value={targetRoleId != null ? String(targetRoleId) : ""}
-          />
-          <input
-            type="hidden"
-            name="startDate"
-            value={startDate ?? ""}
-          />
-          <input type="hidden" name="endDate" value={endDate ?? ""} />
-
-          <input
-            type="text"
-            name="q"
-            placeholder="Buscar por e-mail"
-            defaultValue={searchEmail ?? ""}
-            className="w-full bg-[#1b1d21] border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
-          />
-        </form>
+        <div className="w-full md:w-72">
+          <EmailSearchInput />
+        </div>
       </header>
 
       {talents.length === 0 ? (
