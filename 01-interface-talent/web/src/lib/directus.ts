@@ -183,6 +183,8 @@ type FetchTalentsParams = {
   searchEmail?: string;
   department?: string;
   status?: string;
+  orchestratorState?: string;
+  pdiReady?: boolean;
 };
 
 
@@ -202,6 +204,17 @@ export async function fetchTalentsPage(
 
   if (paramsInput.status) {
     params.set("filter[current_status][_eq]", paramsInput.status);
+  }
+
+  if (paramsInput.orchestratorState) {
+    params.set(
+      "filter[orchestrator_state][_eq]",
+      paramsInput.orchestratorState
+    );
+  }
+
+  if (paramsInput.pdiReady === true) {
+    params.set("filter[pdi_plan_ready][_eq]", "true");
   }
 
     // Se tiver busca por e-mail, primeiro descobrimos os user_ids

@@ -14,6 +14,8 @@ export default async function Page({
   const pageParam = resolvedSearchParams?.page;
   const departmentParam = resolvedSearchParams?.department;
   const statusParam = resolvedSearchParams?.status;
+  const orchestratorParam = resolvedSearchParams?.orchestrator;
+  const pdiParam = resolvedSearchParams?.pdi;
 
   const searchEmail =
     typeof qParam === "string" && qParam.trim() !== ""
@@ -30,6 +32,16 @@ export default async function Page({
       ? statusParam.trim()
       : undefined;
 
+  const orchestratorState =
+    typeof orchestratorParam === "string" && orchestratorParam.trim() !== ""
+      ? orchestratorParam.trim()
+      : undefined;
+
+  const pdiReady =
+    typeof pdiParam === "string" && pdiParam === "true"
+      ? true
+      : undefined;
+
   const page =
     typeof pageParam === "string" && !Number.isNaN(Number(pageParam))
       ? Math.max(1, Number(pageParam))
@@ -43,6 +55,8 @@ export default async function Page({
     searchEmail,
     department,
     status,
+    orchestratorState,
+    pdiReady
   });
 
   const totalPages = total > 0 ? Math.ceil(total / limit) : 1;
@@ -53,8 +67,11 @@ export default async function Page({
     if (searchEmail) params.set("q", searchEmail);
     if (department) params.set("department", department);
     if (status) params.set("status", status);
+    if (orchestratorState) params.set("orchestrator", orchestratorState);
+    if (pdiReady === true) params.set("pdi", "true");
     return `/?${params.toString()}`;
   };
+
 
   return (
     <section className="flex-1">
@@ -69,16 +86,14 @@ export default async function Page({
 
         {/* form SÓ da busca, filtros vêm da sidebar */}
         <form className="w-full md:w-72" action="/" method="GET">
+          <input type="hidden" name="department" value={department ?? ""} />
+          <input type="hidden" name="status" value={status ?? ""} />
           <input
             type="hidden"
-            name="department"
-            value={department ?? ""}
+            name="orchestrator"
+            value={orchestratorState ?? ""}
           />
-          <input
-            type="hidden"
-            name="status"
-            value={status ?? ""}
-          />
+          <input type="hidden" name="pdi" value={pdiReady ? "true" : ""} />
 
           <input
             type="text"
