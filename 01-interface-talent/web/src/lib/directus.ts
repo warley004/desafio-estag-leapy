@@ -1,5 +1,7 @@
 // src/lib/directus.ts
 
+// ---------- Tipos básicos ----------
+
 export type Talent = {
   id: string;
   user_id: string;
@@ -8,6 +10,8 @@ export type Talent = {
   orchestrator_state?: string | null;
   pdi_plan_ready?: boolean | null;
   date_updated?: string | null;
+  leader_id?: number | null;
+  target_role_id?: number | null;
 };
 
 export type TalentWithUser = Talent & {
@@ -15,6 +19,8 @@ export type TalentWithUser = Talent & {
   user_first_name?: string | null;
   user_last_name?: string | null;
   user_full_name?: string | null;
+  leader_name?: string | null;
+  target_role_name?: string | null;
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
@@ -27,13 +33,25 @@ const defaultHeaders: HeadersInit = {
   Authorization: `Bearer ${TOKEN}`,
 };
 
-// ---------- Helpers de usuários ----------
+// ---------- Users ----------
 
 type UserInfo = {
   email: string | null;
   first_name: string | null;
   last_name: string | null;
 };
+
+function buildFullName(user?: UserInfo): string | null {
+  if (!user) return null;
+
+  const first = user.first_name ?? "";
+  const last = user.last_name ?? "";
+  const full = `${first} ${last}`.trim();
+
+  if (full.length > 0) return full;
+  if (user.email) return user.email;
+  return null;
+}
 
 async function fetchUsersByIds(
   ids: string[]
@@ -71,7 +89,93 @@ async function fetchUsersByIds(
   return map;
 }
 
-// ---------- Talents + join com users ----------
+// ---------- Target Roles ----------
+
+async function fetchTargetRolesByIds(
+  ids: number[]
+): Promise<Record<number, string | null>> {
+  if (!ids.length) return {};
+
+  const params = new URLSearchParams();
+  params.set("filter[id][_in]", ids.join(","));
+  params.set("fields", "id,name,title,label");
+  params.set("limit", String(ids.length));
+
+  const res = await fetch(
+    `${BASE_URL}/items/target_roles?${params.toString()}`,
+    {
+      headers: defaultHeaders,
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    console.error("Erro ao buscar target_roles:", await res.text());
+    return {};
+  }
+
+  const json = await res.json();
+
+  const map: Record<number, string | null> = {};
+  if (Array.isArray(json.data)) {
+    for (const role of json.data) {
+      const label =
+        role.name ?? role.title ?? role.label ?? null;
+      map[role.id] = label;
+    }
+  }
+
+  return map;
+}
+
+// ---------- Leaders (internship_leaders) ----------
+
+type LeaderRecord = {
+  user_id: string | null;
+  position: string | null;
+  department: string | null;
+};
+
+async function fetchLeadersByIds(
+  ids: number[]
+): Promise<Record<number, LeaderRecord>> {
+  if (!ids.length) return {};
+
+  const params = new URLSearchParams();
+  params.set("filter[id][_in]", ids.join(","));
+  params.set("fields", "id,user_id,position,department");
+  params.set("limit", String(ids.length));
+
+  const res = await fetch(
+    `${BASE_URL}/items/internship_leaders?${params.toString()}`,
+    {
+      headers: defaultHeaders,
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    console.error("Erro ao buscar internship_leaders:", await res.text());
+    return {};
+  }
+
+  const json = await res.json();
+
+  const map: Record<number, LeaderRecord> = {};
+  if (Array.isArray(json.data)) {
+    for (const leader of json.data) {
+      map[leader.id] = {
+        user_id: leader.user_id ?? null,
+        position: leader.position ?? null,
+        department: leader.department ?? null,
+      };
+    }
+  }
+
+  return map;
+}
+
+// ---------- Talents + joins ----------
 
 type FetchTalentsParams = {
   page?: number;
@@ -88,7 +192,17 @@ export async function fetchTalentsPage(
   params.set("limit", String(limit));
   params.set(
     "fields",
-    "id,user_id,department,current_status,orchestrator_state,pdi_plan_ready,date_updated"
+    [
+      "id",
+      "user_id",
+      "department",
+      "current_status",
+      "orchestrator_state",
+      "pdi_plan_ready",
+      "date_updated",
+      "leader_id",
+      "target_role_id",
+    ].join(",")
   );
   params.set("sort[]", "-date_updated");
 
@@ -106,32 +220,68 @@ export async function fetchTalentsPage(
   const talents: Talent[] = Array.isArray(json.data) ? json.data : [];
   const total: number = json.meta?.total ?? talents.length;
 
-  // pega user_ids únicos
-  const userIds = Array.from(
-    new Set(talents.map((t) => t.user_id).filter(Boolean))
+  // IDs únicos de leaders e roles
+  const leaderIds = Array.from(
+    new Set(
+      talents
+        .map((t) => t.leader_id)
+        .filter((id): id is number => id !== null && id !== undefined)
+    )
+  );
+  const targetRoleIds = Array.from(
+    new Set(
+      talents
+        .map((t) => t.target_role_id)
+        .filter((id): id is number => id !== null && id !== undefined)
+    )
   );
 
-  // busca infos dos usuários
-  const usersMap = await fetchUsersByIds(userIds);
+  // busca leaders e roles em paralelo
+  const [leadersMap, targetRolesMap] = await Promise.all([
+    fetchLeadersByIds(leaderIds),
+    fetchTargetRolesByIds(targetRoleIds),
+  ]);
 
-  // monta array enriquecido com nome + email
+  // IDs de usuários dos talentos + líderes
+  const talentUserIds = talents.map((t) => t.user_id).filter(Boolean);
+  const leaderUserIds = Object.values(leadersMap)
+    .map((l) => l.user_id)
+    .filter((id): id is string => Boolean(id));
+
+  const allUserIds = Array.from(
+    new Set([...talentUserIds, ...leaderUserIds])
+  );
+
+  const usersMap = await fetchUsersByIds(allUserIds);
+
+  // monta array enriquecido
   const enriched: TalentWithUser[] = talents.map((t) => {
-    const user = usersMap[t.user_id];
+    const talentUser = usersMap[t.user_id];
+    const leaderRecord =
+      t.leader_id !== null && t.leader_id !== undefined
+        ? leadersMap[t.leader_id]
+        : undefined;
+    const leaderUser =
+      leaderRecord && leaderRecord.user_id
+        ? usersMap[leaderRecord.user_id]
+        : undefined;
 
-    const first = user?.first_name ?? null;
-    const last = user?.last_name ?? null;
-    const fullNameRaw = `${first ?? ""} ${last ?? ""}`.trim();
-    const fullName =
-      fullNameRaw.length > 0
-        ? fullNameRaw
-        : user?.email ?? null;
+    const targetRoleName =
+      t.target_role_id !== null && t.target_role_id !== undefined
+        ? targetRolesMap[t.target_role_id] ?? null
+        : null;
+
+    const talentFullName = buildFullName(talentUser);
+    const leaderFullName = buildFullName(leaderUser);
 
     return {
       ...t,
-      user_email: user?.email ?? null,
-      user_first_name: first,
-      user_last_name: last,
-      user_full_name: fullName,
+      user_email: talentUser?.email ?? null,
+      user_first_name: talentUser?.first_name ?? null,
+      user_last_name: talentUser?.last_name ?? null,
+      user_full_name: talentFullName,
+      leader_name: leaderFullName,
+      target_role_name: targetRoleName,
     };
   });
 

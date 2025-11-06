@@ -55,8 +55,7 @@ export default function TalentCard({ talent }: { talent: TalentWithUser }) {
         <div>
           <p className="text-gray-400 font-medium">Cargo</p>
           <p className="text-white">
-            {/* TODO: ligar com target_roles depois */}
-            Não informado
+            {talent.target_role_name || "Não informado"}
           </p>
         </div>
 
@@ -70,8 +69,7 @@ export default function TalentCard({ talent }: { talent: TalentWithUser }) {
         <div>
           <p className="text-gray-400 font-medium">Leader</p>
           <p className="text-white">
-            {/* TODO: ligar com internship_leaders depois */}
-            Não informado
+            {talent.leader_name || "Não informado"}
           </p>
         </div>
       </div>
