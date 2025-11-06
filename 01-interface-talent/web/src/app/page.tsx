@@ -16,6 +16,10 @@ export default async function Page({
   const statusParam = resolvedSearchParams?.status;
   const orchestratorParam = resolvedSearchParams?.orchestrator;
   const pdiParam = resolvedSearchParams?.pdi;
+  const leaderParam = resolvedSearchParams?.leader;
+  const roleParam = resolvedSearchParams?.role;
+  const startDateParam = resolvedSearchParams?.startDate;
+  const endDateParam = resolvedSearchParams?.endDate;
 
   const searchEmail =
     typeof qParam === "string" && qParam.trim() !== ""
@@ -41,6 +45,30 @@ export default async function Page({
     typeof pdiParam === "string" && pdiParam === "true"
       ? true
       : undefined;
+  
+  const leaderId =
+    typeof leaderParam === "string" &&
+    leaderParam !== "" &&
+    !Number.isNaN(Number(leaderParam))
+      ? Number(leaderParam)
+      : undefined;
+
+  const targetRoleId =
+    typeof roleParam === "string" &&
+    roleParam !== "" &&
+    !Number.isNaN(Number(roleParam))
+      ? Number(roleParam)
+      : undefined;
+
+  const startDate =
+    typeof startDateParam === "string" && startDateParam !== ""
+      ? startDateParam
+      : undefined;
+
+  const endDate =
+    typeof endDateParam === "string" && endDateParam !== ""
+      ? endDateParam
+      : undefined;
 
   const page =
     typeof pageParam === "string" && !Number.isNaN(Number(pageParam))
@@ -56,7 +84,11 @@ export default async function Page({
     department,
     status,
     orchestratorState,
-    pdiReady
+    pdiReady,
+    leaderId,
+    targetRoleId,
+    startDate,
+    endDate,
   });
 
   const totalPages = total > 0 ? Math.ceil(total / limit) : 1;
@@ -69,9 +101,12 @@ export default async function Page({
     if (status) params.set("status", status);
     if (orchestratorState) params.set("orchestrator", orchestratorState);
     if (pdiReady === true) params.set("pdi", "true");
+    if (leaderId != null) params.set("leader", String(leaderId));
+    if (targetRoleId != null) params.set("role", String(targetRoleId));
+    if (startDate) params.set("startDate", startDate);
+    if (endDate) params.set("endDate", endDate);
     return `/?${params.toString()}`;
   };
-
 
   return (
     <section className="flex-1">
@@ -85,7 +120,7 @@ export default async function Page({
         </div>
 
         {/* form SÓ da busca, filtros vêm da sidebar */}
-        <form className="w-full md:w-72" action="/" method="GET">
+                <form className="w-full md:w-72" action="/" method="GET">
           <input type="hidden" name="department" value={department ?? ""} />
           <input type="hidden" name="status" value={status ?? ""} />
           <input
@@ -94,6 +129,22 @@ export default async function Page({
             value={orchestratorState ?? ""}
           />
           <input type="hidden" name="pdi" value={pdiReady ? "true" : ""} />
+          <input
+            type="hidden"
+            name="leader"
+            value={leaderId != null ? String(leaderId) : ""}
+          />
+          <input
+            type="hidden"
+            name="role"
+            value={targetRoleId != null ? String(targetRoleId) : ""}
+          />
+          <input
+            type="hidden"
+            name="startDate"
+            value={startDate ?? ""}
+          />
+          <input type="hidden" name="endDate" value={endDate ?? ""} />
 
           <input
             type="text"

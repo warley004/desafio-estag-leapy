@@ -185,43 +185,77 @@ type FetchTalentsParams = {
   status?: string;
   orchestratorState?: string;
   pdiReady?: boolean;
+  leaderId?: number;
+  targetRoleId?: number;
+  startDate?: string;
+  endDate?: string;   
 };
 
 
 export async function fetchTalentsPage(
   paramsInput: FetchTalentsParams = {}
 ): Promise<{ talents: TalentWithUser[]; total: number }> {
-  const { page = 1, limit = 10 } = paramsInput;
+  const {
+    page = 1,
+    limit = 10,
+    searchEmail,
+    department,
+    status,
+    orchestratorState,
+    pdiReady,
+    leaderId,
+    targetRoleId,
+    startDate,
+    endDate,
+  } = paramsInput;
 
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("limit", String(limit));
   params.set("meta", "filter_count");
 
-  if (paramsInput.department) {
-    params.set("filter[department][_eq]", paramsInput.department);
+    // filtros simples pelos campos do talento
+
+  if (department) {
+    params.set("filter[department][_eq]", department);
   }
 
-  if (paramsInput.status) {
-    params.set("filter[current_status][_eq]", paramsInput.status);
+  if (status) {
+    params.set("filter[current_status][_eq]", status);
   }
 
-  if (paramsInput.orchestratorState) {
-    params.set(
-      "filter[orchestrator_state][_eq]",
-      paramsInput.orchestratorState
-    );
+  if (orchestratorState) {
+    params.set("filter[orchestrator_state][_eq]", orchestratorState);
   }
 
-  if (paramsInput.pdiReady === true) {
+  if (pdiReady === true) {
     params.set("filter[pdi_plan_ready][_eq]", "true");
   }
+
+  if (leaderId != null) {
+    params.set("filter[leader_id][_eq]", String(leaderId));
+  }
+
+  if (targetRoleId != null) {
+    params.set("filter[target_role_id][_eq]", String(targetRoleId));
+  }
+
+  if (startDate) {
+    // talentos que começam a partir dessa data
+    params.set("filter[start_date][_gte]", startDate);
+  }
+
+  if (endDate) {
+    // talentos que terminam até essa data
+    params.set("filter[end_date][_lte]", endDate);
+  }
+
 
     // Se tiver busca por e-mail, primeiro descobrimos os user_ids
   let userIdsFilter: string[] | null = null;
 
-  if (paramsInput.searchEmail && paramsInput.searchEmail.trim() !== "") {
-    const q = paramsInput.searchEmail.trim();
+  if (searchEmail && searchEmail.trim() !== "") {
+    const q = searchEmail.trim();
 
     const searchParams = new URLSearchParams();
     // usa filtro "contém" no email (case-insensitive no Postgres)
@@ -267,6 +301,8 @@ export async function fetchTalentsPage(
       "date_updated",
       "leader_id",
       "target_role_id",
+      "start_date",
+      "end_date",
     ].join(",")
   );
   params.set("sort[]", "-date_updated");
