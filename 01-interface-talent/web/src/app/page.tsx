@@ -12,10 +12,22 @@ export default async function Page({
 
   const qParam = resolvedSearchParams?.q;
   const pageParam = resolvedSearchParams?.page;
+  const departmentParam = resolvedSearchParams?.department;
+  const statusParam = resolvedSearchParams?.status;
 
   const searchEmail =
     typeof qParam === "string" && qParam.trim() !== ""
       ? qParam.trim()
+      : undefined;
+
+  const department =
+    typeof departmentParam === "string" && departmentParam.trim() !== ""
+      ? departmentParam.trim()
+      : undefined;
+
+  const status =
+    typeof statusParam === "string" && statusParam.trim() !== ""
+      ? statusParam.trim()
       : undefined;
 
   const page =
@@ -23,28 +35,31 @@ export default async function Page({
       ? Math.max(1, Number(pageParam))
       : 1;
 
-  const limit = 8; // quantos talentos por página
+  const limit = 8;
 
   const { talents, total } = await fetchTalentsPage({
     page,
     limit,
     searchEmail,
+    department,
+    status,
   });
 
-  const totalPages =
-    total > 0 ? Math.ceil(total / limit) : 1;
+  const totalPages = total > 0 ? Math.ceil(total / limit) : 1;
 
-  // helper pra manter ?q=... na navegação
   const buildHref = (newPage: number) => {
     const params = new URLSearchParams();
     params.set("page", String(newPage));
     if (searchEmail) params.set("q", searchEmail);
+    if (department) params.set("department", department);
+    if (status) params.set("status", status);
     return `/?${params.toString()}`;
   };
 
   return (
-    <section>
-      <header className="flex justify-between items-center mb-8 gap-4">
+    <section className="flex-1">
+      {/* HEADER: título + BUSCA */}
+      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold">Talentos</h1>
           <p className="text-gray-400 text-sm">
@@ -52,7 +67,19 @@ export default async function Page({
           </p>
         </div>
 
-        <form className="w-72" action="/" method="GET">
+        {/* form SÓ da busca, filtros vêm da sidebar */}
+        <form className="w-full md:w-72" action="/" method="GET">
+          <input
+            type="hidden"
+            name="department"
+            value={department ?? ""}
+          />
+          <input
+            type="hidden"
+            name="status"
+            value={status ?? ""}
+          />
+
           <input
             type="text"
             name="q"

@@ -1,44 +1,48 @@
 // src/app/layout.tsx
-import "@/app/globals.css";
+import "./globals.css";
+import type { Metadata } from "next";
+import FiltersSidebar from "@/components/FiltersSidebar";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Leapy Talents",
+  description: "Dashboard de talentos",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="pt-BR">
-      <body className="bg-[#0e0f11] text-white min-h-screen flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-[#15171a] p-6 flex flex-col justify-between">
-          <div>
-            <h1 className="text-lg font-semibold mb-8 flex items-center gap-2">
-              <span className="text-violet-400">➜</span> Leapy Talents
-            </h1>
-
-            <nav className="space-y-6 text-sm">
-              <div>
-                <h2 className="text-gray-400 uppercase text-xs mb-3 tracking-wider">
-                  Filtros
-                </h2>
-                <ul className="space-y-2">
-                  <li className="cursor-pointer hover:text-violet-400">Department</li>
-                  <li className="cursor-pointer hover:text-violet-400">Current Status</li>
-                  <li className="cursor-pointer hover:text-violet-400">Orchestrator State</li>
-                  <li className="cursor-pointer hover:text-violet-400">Período</li>
-                  <li className="cursor-pointer hover:text-violet-400">PDI Pronto</li>
-                </ul>
+      <body className="bg-black text-gray-100">
+        <div className="flex min-h-screen">
+          {/* SIDEBAR GLOBAL */}
+          <aside className="w-64 bg-[#050509] border-r border-gray-900 px-6 py-6 flex flex-col">
+            {/* Logo / título */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2">
+                <span className="text-violet-400 text-xl">➜</span>
+                <span className="font-semibold text-lg">Leapy Talents</span>
               </div>
-            </nav>
-          </div>
+            </div>
 
-          <button className="mt-8 bg-violet-600 text-sm px-4 py-2 rounded-md hover:bg-violet-700 transition">
-            Aplicar
-          </button>
-        </aside>
+            <h2 className="text-xs font-semibold tracking-wide text-gray-400">
+              FILTROS
+            </h2>
 
-        {/* Main Content */}
-        <main className="flex-1 p-10 overflow-y-auto">{children}</main>
+            {/* AQUI entram os dropdowns de fato */}
+            <FiltersSidebar />
+
+            {/* se quiser deixar aqueles itens de texto (Department, Current Status...)
+                como "tabs", pode removê-los ou mantê-los abaixo só como legenda */}
+          </aside>
+
+          {/* CONTEÚDO */}
+          <main className="flex-1 px-10 py-8">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );

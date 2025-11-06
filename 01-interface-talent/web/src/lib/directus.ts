@@ -181,6 +181,8 @@ type FetchTalentsParams = {
   page?: number;
   limit?: number;
   searchEmail?: string;
+  department?: string;
+  status?: string;
 };
 
 
@@ -193,6 +195,14 @@ export async function fetchTalentsPage(
   params.set("page", String(page));
   params.set("limit", String(limit));
   params.set("meta", "filter_count");
+
+  if (paramsInput.department) {
+    params.set("filter[department][_eq]", paramsInput.department);
+  }
+
+  if (paramsInput.status) {
+    params.set("filter[current_status][_eq]", paramsInput.status);
+  }
 
     // Se tiver busca por e-mail, primeiro descobrimos os user_ids
   let userIdsFilter: string[] | null = null;
