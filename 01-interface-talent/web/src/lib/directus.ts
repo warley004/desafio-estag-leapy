@@ -180,7 +180,9 @@ async function fetchLeadersByIds(
 type FetchTalentsParams = {
   page?: number;
   limit?: number;
+  searchEmail?: string;
 };
+
 
 export async function fetchTalentsPage(
   paramsInput: FetchTalentsParams = {}
@@ -190,6 +192,45 @@ export async function fetchTalentsPage(
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("limit", String(limit));
+
+    // Se tiver busca por e-mail, primeiro descobrimos os user_ids
+  let userIdsFilter: string[] | null = null;
+
+  if (paramsInput.searchEmail && paramsInput.searchEmail.trim() !== "") {
+    const q = paramsInput.searchEmail.trim();
+
+    const searchParams = new URLSearchParams();
+    // usa filtro "contém" no email (case-insensitive no Postgres)
+    searchParams.set("filter[email][_icontains]", q);
+    searchParams.set("fields", "id");
+    searchParams.set("limit", "100"); // limite razoável de usuários
+
+    const usersRes = await fetch(
+      `${BASE_URL}/users?${searchParams.toString()}`,
+      {
+        headers: defaultHeaders,
+        cache: "no-store",
+      }
+    );
+
+    if (!usersRes.ok) {
+      console.error("Erro ao buscar usuários por email:", await usersRes.text());
+      // se der erro aqui, consideramos que não achou ninguém
+      userIdsFilter = [];
+    } else {
+      const usersJson = await usersRes.json();
+      const ids = Array.isArray(usersJson.data)
+        ? usersJson.data.map((u: any) => u.id).filter(Boolean)
+        : [];
+      userIdsFilter = ids;
+    }
+
+    // Se não achou nenhum usuário com esse email, já devolve vazio
+    if (!userIdsFilter?.length) {
+      return { talents: [], total: 0 };
+    }
+  }
+
   params.set(
     "fields",
     [
@@ -205,6 +246,10 @@ export async function fetchTalentsPage(
     ].join(",")
   );
   params.set("sort[]", "-date_updated");
+
+  if (userIdsFilter && userIdsFilter.length) {
+    params.set("filter[user_id][_in]", userIdsFilter.join(","));
+  }
 
   const res = await fetch(`${BASE_URL}/items/talents?${params.toString()}`, {
     headers: defaultHeaders,
