@@ -15,26 +15,26 @@ export default function EmailSearchInput() {
     setValue(initialQuery);
   }, [initialQuery]);
 
-  // Debounce: espera 500ms depois de parar de digitar
+  // Debounce: espera 250ms depois de parar de digitar
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      const current = searchParams.toString();
-      const params = new URLSearchParams(current);
+  const timeout = setTimeout(() => {
+    // pega os parâmetros ATUAIS da URL
+    const params = new URLSearchParams(window.location.search);
 
-      if (value && value.trim() !== "") {
-        params.set("q", value.trim());
-      } else {
-        params.delete("q");
-      }
+    if (value && value.trim() !== "") {
+      params.set("q", value.trim());
+    } else {
+      params.delete("q");
+    }
 
-      // sempre que mudar a busca, volta pra página 1
-      params.set("page", "1");
+    // sempre que a busca mudar, volta pra página 1
+    params.set("page", "1");
 
-      router.push(`/?${params.toString()}`, { scroll: false });
-    }, 250); // 250ms de debounce
+    router.push(`/?${params.toString()}`, { scroll: false });
+  }, 250);
 
-    return () => clearTimeout(timeout);
-  }, [value, searchParams, router]);
+  return () => clearTimeout(timeout);
+  }, [value, router]);
 
   return (
     <input
