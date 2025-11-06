@@ -77,7 +77,7 @@ export default function TalentCard({ talent }: { talent: TalentWithUser }) {
       {/* Bottom grid: department / role / orchestrator / leader / period / PDI */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-xs sm:text-sm text-gray-200">
         <div>
-          <p className="text-gray-400 font-medium">Department</p>
+          <p className="text-gray-400 font-medium">Departamento</p>
           <p className="text-white">
             {talent.department || "Não informado"}
           </p>
@@ -98,7 +98,7 @@ export default function TalentCard({ talent }: { talent: TalentWithUser }) {
         </div>
 
         <div>
-          <p className="text-gray-400 font-medium">Leader</p>
+          <p className="text-gray-400 font-medium">Liderança</p>
           <p className="text-white">
             {talent.leader_name || "Não informado"}
           </p>

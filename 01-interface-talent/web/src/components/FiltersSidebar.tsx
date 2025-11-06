@@ -1,4 +1,3 @@
-// src/components/FiltersSidebar.tsx
 
 type FiltersSidebarProps = {
   department?: string;
@@ -41,11 +40,29 @@ export default function FiltersSidebar({
   return (
     <aside className="w-full max-w-xs bg-[#111217] border-r border-gray-800 px-5 py-6 flex flex-col gap-6">
 
+      {/* 🔹 HEADER COM LOGO E TÍTULO */}
+      <div className="flex items-center gap-2 mb-4">
+        {/* Imagem da logo */}
+        
+          {/* Troque o caminho abaixo pela sua imagem real */}
+          <img
+            src="/images/LeapyLogo.png"
+            width={110}
+            height={110}
+            className="object-contain"
+            />
+
+        {/* Título */}
+        <h1 className="text-[15px] font-semibold text-gray-100 tracking-wide">
+          Leapy Talents
+        </h1>
+      </div>
+
       <form action="/" method="GET" className="flex flex-col gap-5">
         {/* Department */}
         <div className="space-y-1">
           <label className="text-xs font-medium text-gray-400">
-            Department
+            Departamento
           </label>
           <select
             name="department"
@@ -64,7 +81,7 @@ export default function FiltersSidebar({
         {/* Current Status */}
         <div className="space-y-1">
           <label className="text-xs font-medium text-gray-400">
-            Current Status
+            Status
           </label>
           <select
             name="status"
@@ -128,7 +145,7 @@ export default function FiltersSidebar({
 
         {/* Leader */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-gray-400">Leader</label>
+          <label className="text-xs font-medium text-gray-400">Liderança</label>
           <select
             name="leader"
             defaultValue={leaderId != null ? String(leaderId) : ""}
@@ -195,25 +212,36 @@ export default function FiltersSidebar({
           </select>
         </div>
 
-        {/* PDI Pronto – toggle em vez de checkbox */}
+        {/* PDI Pronto – toggle */}
         <div className="space-y-1">
-          <label className="flex items-center justify-between text-xs font-medium text-gray-400">
+        <label className="flex items-center justify-between text-xs font-medium text-gray-400">
             <span>PDI Pronto</span>
 
-            {/* input invisível + CSS via peer => vira um toggle */}
             <span className="inline-flex items-center">
-              <input
+            <input
                 type="checkbox"
                 name="pdi"
                 value="true"
                 defaultChecked={pdiReady}
                 className="sr-only peer"
-              />
-              <span className="w-10 h-5 rounded-full bg-gray-600 peer-checked:bg-violet-500 transition-colors relative">
-                <span className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transform peer-checked:translate-x-5 transition-transform" />
-              </span>
+            />
+            <span
+                className="
+                flex w-10 h-5 items-center rounded-full bg-gray-600
+                peer-checked:bg-violet-500
+                transition-colors px-0.5
+                peer-checked:justify-end
+                "
+            >
+                <span
+                className="
+                    h-4 w-4 rounded-full bg-white shadow
+                    transition-all
+                "
+                />
             </span>
-          </label>
+            </span>
+        </label>
         </div>
 
         {/* Botões: aplicar + limpar tudo */}

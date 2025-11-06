@@ -1,8 +1,10 @@
 // src/app/page.tsx
+
 import Link from "next/link";
 import { fetchTalentsPage } from "@/lib/directus";
 import TalentCard from "@/components/TalentCard";
 import EmailSearchInput from "@/components/EmailSearchInput";
+import FiltersSidebar from "@/components/FiltersSidebar";
 
 export default async function Page({
   searchParams,
@@ -38,7 +40,8 @@ export default async function Page({
       : undefined;
 
   const orchestratorState =
-    typeof orchestratorParam === "string" && orchestratorParam.trim() !== ""
+    typeof orchestratorParam === "string" &&
+    orchestratorParam.trim() !== ""
       ? orchestratorParam.trim()
       : undefined;
 
@@ -46,7 +49,7 @@ export default async function Page({
     typeof pdiParam === "string" && pdiParam === "true"
       ? true
       : undefined;
-  
+
   const leaderId =
     typeof leaderParam === "string" &&
     leaderParam !== "" &&
@@ -110,63 +113,77 @@ export default async function Page({
   };
 
   return (
-    <section className="flex-1">
-      {/* HEADER: título + BUSCA */}
-      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-semibold">Talentos</h1>
+    <div className="flex min-h-screen">
+      {/* SIDEBAR COM FILTROS */}
+      <FiltersSidebar
+        department={department}
+        status={status}
+        orchestratorState={orchestratorState}
+        startDate={startDate}
+        endDate={endDate}
+        leaderId={leaderId ?? null}
+        targetRoleId={targetRoleId ?? null}
+        pdiReady={pdiReady}
+      />
+
+      {/* CONTEÚDO PRINCIPAL */}
+      <section className="flex-1 px-8 py-8">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold">Talentos</h1>
+            <p className="text-gray-400 text-sm">
+              {total} resultados encontrados
+            </p>
+          </div>
+
+          <div className="w-full md:w-72">
+            <EmailSearchInput />
+          </div>
+        </header>
+
+        {talents.length === 0 ? (
           <p className="text-gray-400 text-sm">
-            {total} resultados encontrados
+            Nenhum talento encontrado para os filtros atuais.
           </p>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {talents.map((t) => (
+              <TalentCard key={t.id} talent={t} />
+            ))}
+          </div>
+        )}
 
-        <div className="w-full md:w-72">
-          <EmailSearchInput />
-        </div>
-      </header>
+        <footer className="mt-8 flex items-center justify-between text-gray-500 text-sm">
+          <span>
+            Página {page} de {totalPages}
+          </span>
 
-      {talents.length === 0 ? (
-        <p className="text-gray-400 text-sm">
-          Nenhum talento encontrado para os filtros atuais.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {talents.map((t) => (
-            <TalentCard key={t.id} talent={t} />
-          ))}
-        </div>
-      )}
-
-      <footer className="mt-8 flex items-center justify-between text-gray-500 text-sm">
-        <span>
-          Página {page} de {totalPages}
-        </span>
-
-        <div className="flex gap-3">
-          <Link
-            href={buildHref(page - 1)}
-            aria-disabled={page === 1}
-            className={`px-3 py-1 rounded-md border border-gray-700 ${
-              page === 1
-                ? "opacity-40 pointer-events-none"
-                : "hover:bg-[#1b1d21]"
-            }`}
-          >
-            Anterior
-          </Link>
-          <Link
-            href={buildHref(page + 1)}
-            aria-disabled={page >= totalPages}
-            className={`px-3 py-1 rounded-md border border-gray-700 ${
-              page >= totalPages
-                ? "opacity-40 pointer-events-none"
-                : "hover:bg-[#1b1d21]"
-            }`}
-          >
-            Próxima
-          </Link>
-        </div>
-      </footer>
-    </section>
+          <div className="flex gap-3">
+            <Link
+              href={buildHref(page - 1)}
+              aria-disabled={page === 1}
+              className={`px-3 py-1 rounded-md border border-gray-700 ${
+                page === 1
+                  ? "opacity-40 pointer-events-none"
+                  : "hover:bg-[#1b1d21]"
+              }`}
+            >
+              Anterior
+            </Link>
+            <Link
+              href={buildHref(page + 1)}
+              aria-disabled={page >= totalPages}
+              className={`px-3 py-1 rounded-md border border-gray-700 ${
+                page >= totalPages
+                  ? "opacity-40 pointer-events-none"
+                  : "hover:bg-[#1b1d21]"
+              }`}
+            >
+              Próxima
+            </Link>
+          </div>
+        </footer>
+      </section>
+    </div>
   );
 }
