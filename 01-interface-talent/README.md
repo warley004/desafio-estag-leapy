@@ -1,252 +1,236 @@
 # 🧭 Desafio 01 — Interface de Talentos
 
-Projeto: **Leapy Talents**
+Projeto **Leapy Talents**: interface de listagem, busca e filtragem de talentos construída com Next.js, TypeScript e Tailwind. A aplicação consome dados de um Directus + PostgreSQL containerizado em Docker e entrega uma experiência completa de exploração da base (busca, filtros e paginação).
 
-Interface de listagem, busca e filtragem de talentos construída em Next.js + TypeScript + Tailwind, consumindo dados do Directus + PostgreSQL via Docker. O objetivo é oferecer uma experiência completa de busca, filtros e paginação sobre a base de talentos.
+---
 
-## 🎯 Objetivo
+## 📐 Arquitetura
 
-Implementar uma aplicação que:
-
-- Liste talentos armazenados no banco PostgreSQL via Directus.
-- Permita:
-  - Busca por `directus_users.email` (join com `talents.user_id -> directus_users.id`).
-  - Filtros:
-	 - `department`, `current_status`, `pdi_plan_ready`, `orchestrator_state`.
-	 - Intervalo de `start_date / end_date`.
-	 - `leader_id`, `target_role_id`.
-  - Paginação server-side.
-  - Ordenação por `date_updated` DESC.
-- Exiba:
-  - Contagem total de resultados.
-  - Estado de carregamento.
-  - Mensagem para estados vazios.
-- Seja responsiva, acessível e visualmente consistente (dark theme).
-
-## ⚙️ Stack utilizada
-
-### Backend (dados)
-
-- PostgreSQL (armazenamento).
-- Directus CMS (API REST/GraphQL).
-- Docker + Docker Compose.
-
-### Frontend
-
-- Next.js (App Router).
-- TypeScript.
-- Tailwind CSS.
-- SSR (Server-Side Rendering).
-- Debounce na busca.
-- Filtros persistentes via querystring.
-
-### Testes
-
-- Vitest + Testing Library (unit tests para funções e componentes).
-
-## 🏗️ Estrutura do projeto
-
-```text
-📦 leapy-talents/
-├── directus/            # Backend: PostgreSQL + Directus (via docker-compose)
-│   ├── docker-compose.yml
-│   ├── .env.example
-│   ├── seed/
-│   │   ├── schema.sql   # Estrutura do banco
-│   │   └── seed.sql     # Geração dos dados iniciais (~100 talentos)
-│   └── ...
-├── web/                 # Frontend (Next.js + TypeScript)
+```
+01-interface-talent/
+├── api/
+│   └── rest.http                # Coleção de chamadas para inspeção rápida da API
+├── directus/
+│   ├── docker-compose.yml       # Orquestra Directus + PostgreSQL
+│   ├── .env                     # Variáveis necessárias para subir os serviços
+│   ├── extensions/              # Lugar para extensões/customizações do Directus
+│   └── seed/
+│       ├── schema.sql           # Criação de tabelas
+│       └── seed.sql             # Dados fictícios (~100 talentos)
+├── web/
+│   ├── public/
 │   ├── src/
-│   │   ├── app/
-│   │   │   ├── layout.tsx   # Layout global (tema e estrutura de colunas)
-│   │   │   └── page.tsx     # Página principal (SSR + filtros)
-│   │   ├── components/      # Sidebar, TalentCard, EmailSearchInput
-│   │   └── lib/
-│   │       └── directus.ts  # Lógica de fetch e joins (users, leaders, roles)
-│   ├── tests/               # Testes unitários (Vitest)
-│   ├── public/images/       # Logo Leapy Talents
-│   ├── vitest.config.ts     # Configuração do Vitest
-│   ├── vitest.setup.ts      # Setup global de testes
-│   └── .env.local           # Variáveis do frontend
-└── README.md                # Documentação completa
+│   │   ├── app/                 # Rotas (App Router) e SSR
+│   │   ├── components/          # UI reutilizável (Sidebar, Cards, Inputs...)
+│   │   └── lib/directus.ts      # Clientes e utilitários de integração
+│   ├── package.json             # Scripts de desenvolvimento
+│   ├── tsconfig.json            # Configuração TypeScript + Vitest
+│   ├── vitest.config.ts         # Test runner
+│   └── vitest.setup.ts          # Mocks globais de testes
+└── README.md                    # Este guia
 ```
 
-## 🐘 Como rodar o backend (Directus + Postgres)
+- **Backend:** Directus exposto em `http://localhost:8055`, com PostgreSQL acoplado.
+- **Frontend:** Next.js 16 (App Router), SSR, Tailwind 4 e componentes client-side para filtros.
+- **Testes:** Vitest + Testing Library (components) + vi mocks (fetch / timers).
 
-### Pré-requisitos
+---
 
-- Docker.
-- Docker Compose.
+## ⚙️ Stack
 
-### Passos
+| Camada     | Tecnologias principais                                                            |
+|------------|------------------------------------------------------------------------------------|
+| Backend    | Directus, PostgreSQL 15, Docker, Docker Compose                                    |
+| Frontend   | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4                                 |
+| Tooling    | ESLint 9, Vitest 2, Testing Library, jsdom                                        |
 
-1. Copie o arquivo de variáveis de ambiente:
-	```sh
-	cp directus/.env.example directus/.env
-	```
-2. Suba os containers:
-	```sh
-	docker compose -f directus/docker-compose.yml up -d --build
-	```
-3. Acesse o painel do Directus: [http://localhost:8055](http://localhost:8055)
-4. Crie o primeiro usuário administrador (o Directus solicitará isso automaticamente).
+---
 
-### Estrutura do banco
+## ✅ Pré-requisitos
 
-As tabelas são criadas a partir do `schema.sql`:
+| Ferramenta      | Versão recomendada | Observações                                 |
+|-----------------|--------------------|----------------------------------------------|
+| Docker & Compose| Docker Desktop 4+  | Necessários para subir Directus e PostgreSQL |
+| Node.js         | 18 LTS ou 20 LTS   | Utilizado pelo frontend (Next.js)            |
+| npm             | 9+                 | Gerenciador de pacotes padrão                |
 
-- `public.talents`.
-- `public.internship_leaders`.
-- `public.target_roles`.
-- (`directus_users` é criada automaticamente pelo Directus.)
+---
 
-A `seed.sql` popula o banco com dados fictícios (100 talentos e relacionamentos válidos). As associações (`user_id`, `leader_id`, `target_role_id`) foram inseridas manualmente via terminal, garantindo integridade entre as tabelas e o Directus.
+## 🔐 Variáveis de ambiente
 
-### Token de autenticação
+Os arquivos de exemplo já estão incluídos no repositório para facilitar a configuração.  
+Nenhum deles contém credenciais sensíveis — apenas placeholders seguros.
 
-Para o frontend acessar a API:
+### 📁 Backend (`directus/.env.example`)
 
-1. No painel do Directus → **Settings** → **Access Control** → **Admin** → **Tokens**.
-2. Clique em “Generate Token” e copie o valor.
-3. Cole no `.env.local` do frontend como `NEXT_PUBLIC_DIRECTUS_STATIC_TOKEN`.
+Copie o arquivo de exemplo e renomeie para `.env` antes de subir o Directus:
 
-## 💻 Como rodar o frontend (Next.js + TypeScript)
-
-### Pré-requisitos
-
-- Node.js 18+.
-- npm (ou pnpm).
-
-### Passos
-
-1. Vá até a pasta do frontend:
-	```sh
-	cd web
-	```
-2. Copie o arquivo de exemplo e preencha as variáveis:
-	```sh
-	cp .env.local.example .env.local
-	```
-	Exemplo de `.env.local`:
-	```env
-	NEXT_PUBLIC_DIRECTUS_URL=http://localhost:8055
-	NEXT_PUBLIC_DIRECTUS_STATIC_TOKEN=SEU_TOKEN_DO_DIRECTUS
-	```
-3. Instale as dependências:
-	```sh
-	npm install
-	```
-4. Execute o servidor local:
-	```sh
-	npm run dev
-	```
-
-Acesse: [http://localhost:3000](http://localhost:3000)
-
-## 🧩 Funcionalidades implementadas
-
-### 🔍 Busca com debounce
-
-- Campo de busca por email (`directus_users.email`).
-- Delay de 250 ms para evitar múltiplas requisições.
-- Persistência na URL (`?q=email@teste.com`).
-
-### 🎚️ Filtros
-
-- Department.
-- Current Status.
-- Orchestrator State.
-- Período (`start_date / end_date`).
-- Leader.
-- Cargo (`target_role_id`).
-- PDI Pronto (toggle animado).
-
-Todos os filtros:
-
-- São persistentes na URL.
-- Podem ser combinados livremente.
-- Têm botão “Limpar período” e “Limpar todos os filtros”.
-
-### 📄 Paginação
-
-- Lógica server-side.
-- Controle de página via `?page=`.
-- Botões “Anterior” e “Próxima” com estados desativados quando aplicável.
-
-### 🧭 Estados visuais
-
-- Carregando, vazio e erro tratados.
-- Contador total de resultados exibido.
-
-### 🎨 UX/UI
-
-- Tema escuro (`#0e0f11`, `#1b1d21`).
-- Sidebar rolável independente do corpo.
-- Layout limitado a 4 cards por tela (sem scroll vertical na listagem).
-- Transições suaves e componentes com feedback visual.
-
-## 🧪 Testes unitários (Vitest)
-
-### Estrutura
-
-Os testes estão localizados em `web/tests/`, com suporte configurado em:
-
-- `vitest.config.ts`.
-- `vitest.setup.ts`.
-
-### Executando os testes
-
-A partir da pasta `/web`, execute:
-
-```sh
-npm run test
-```
-
-### O que é testado
-
-- Funções utilitárias (`directus.ts`, formatadores, paginação).
-- Componentes principais (`TalentCard`, `EmailSearchInput`).
-- Validação e consistência de filtros.
-
-## ⚡ Quickstart — Execução completa
-
-```sh
-# 🐘 Backend
+```bash
 cp directus/.env.example directus/.env
-docker compose -f directus/docker-compose.yml up -d --build
-# Acesse http://localhost:8055 e crie o primeiro usuário
-
-# 💻 Frontend
-cd web
-cp .env.local.example .env.local
-npm install
-npm run dev
-# Acesse http://localhost:3000
-
-# 🧪 Testes unitários
-npm run test
 ```
 
-## 🧠 Decisões técnicas e trade-offs
+**Conteúdo padrão:**
 
-- Join manual (REST) — controla melhor os relacionamentos (user, leader, role), evitando N+1 queries.
-- Server Components (Next.js App Router) — garante SSR, SEO e sincronização automática com filtros.
-- Debounce no client + SSR render — otimiza performance e experiência de busca.
-- UX-first design — layout fixo de 4 cards por tela, scroll independente na sidebar, componentes acessíveis.
-- Vitest para estabilidade — testes unitários leves e rápidos garantem segurança de refatorações.
+```env
+PORT=8055
+PUBLIC_URL=http://localhost:8055
+KEY=replace-with-secure-key
+SECRET=replace-with-secure-secret
+
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=admin
+
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=leapy
+POSTGRES_PORT=5432
+
+EXTENSIONS_AUTO_RELOAD=true
+DIRECTUS_EXPERIMENTAL_GRAPHQL_INTROSPECTION=true
+```
+
+🟢 Esse arquivo define as variáveis essenciais para subir o Directus e o PostgreSQL via Docker.  
+Nenhuma credencial real é incluída — todos os valores são exemplos.
+
+### 💻 Frontend (`web/.env.local.example`)
+
+Copie o arquivo de exemplo e renomeie para `.env.local` antes de rodar o Next.js:
+
+```bash
+cp web/.env.local.example web/.env.local
+```
+
+**Conteúdo padrão:**
+
+```env
+NEXT_PUBLIC_DIRECTUS_URL=http://localhost:8055
+NEXT_PUBLIC_DIRECTUS_TOKEN=<INSIRA_SEU_TOKEN_STATICO_DO_DIRECTUS>
+```
+
+- `NEXT_PUBLIC_DIRECTUS_URL`: URL base da instância Directus local.
+- `NEXT_PUBLIC_DIRECTUS_TOKEN`: token estático de leitura, gerado no painel Directus em **Settings → Access Control → Admin → Tokens → Generate Token**.
+
+### 🧩 Gitignore atualizado
+
+Para permitir o versionamento dos arquivos de exemplo, o `.gitignore` foi ajustado para:
+
+```bash
+# ignore only real env files, not examples
+.env
+.env.local
+.env.production
+```
+
+Isso garante que:
+
+- ✅ Os arquivos reais (`.env` e `.env.local`) continuam protegidos.
+- ✅ Os exemplos (`.env.example` e `.env.local.example`) são versionados e visíveis no PR.
+
+---
+
+## 🚀 Passo a passo de setup
+
+### 1. Clonar o repositório
+
+```sh
+# a partir da raiz onde deseja trabalhar
+cd desafio-estag-leapy/01-interface-talent
+```
+
+### 2. Backend (Directus + PostgreSQL)
+
+1. Configure o arquivo `directus/.env` (use o exemplo já disponível como base).
+2. Suba os serviços Docker:
+	 ```sh
+	 docker compose -f directus/docker-compose.yml up -d --build
+	 ```
+3. Aguarde a inicialização. As migrations (`schema.sql`) e seeds (`seed.sql`) são aplicadas automaticamente na primeira subida.
+4. Acesse [http://localhost:8055](http://localhost:8055) e crie o primeiro usuário administrador (caso solicitado).
+5. Após logado, gere um **Static Token** (Settings → Access Control → Admin → Tokens) e guarde o valor para o frontend.
+
+> Para derrubar os serviços, execute `docker compose -f directus/docker-compose.yml down`.
+
+### 3. Frontend (Next.js)
+
+1. Entre na pasta `web`:
+	 ```sh
+	 cd web
+	 ```
+2. Crie `.env.local` com os valores descritos anteriormente.
+3. Instale as dependências:
+	 ```sh
+	 npm install
+	 ```
+4. Rode o servidor de desenvolvimento:
+	 ```sh
+	 npm run dev
+	 ```
+5. Acesse a aplicação em [http://localhost:3000](http://localhost:3000).
+
+> O frontend realiza SSR, portanto as consultas ao Directus acontecem no servidor Next. Certifique-se de que o backend esteja rodando antes de abrir a interface.
+
+---
+
+## 🧪 Testes e qualidade
+
+- **Testes unitários:**
+	```sh
+	npm run test
+	```
+	Executa Vitest em modo headless, com suporte a jsdom e Testing Library. Cobrem componentes críticos (cards, filtros, busca) e utilitários (`lib/directus`).
+
+- **Lint:**
+	```sh
+	npm run lint
+	```
+
+- **Build de produção:**
+	```sh
+	npm run build
+	```
+
+> Todos os scripts devem ser executados dentro da pasta `web`.
+
+---
+
+## 🔍 Principais funcionalidades
+
+- **Busca com debounce (250 ms)**: digite um e-mail para filtrar talentos (`directus_users.email`).
+- **Filtros combináveis**: departamento, status, orchestrator state, líder, cargo, PDI pronto e intervalo de datas.
+- **Persistência na URL**: filtros e página atual ficam refletidos em query strings.
+- **Paginação server-side**: controle via `?page=` com botões "Anterior"/"Próxima".
+- **Estados visuais**: carregando, vazio, erro e contagem total de resultados.
+- **UI responsiva (dark)**: sidebar independente, cards com micro interações e acessibilidade básica.
+
+---
+
+## � Decisões de engenharia
+
+- **Directus + PostgreSQL via Docker**: provisionamento rápido, dados fake via seeds e administração via painel.
+- **Next.js App Router com Server Components**: SSR imediato e sincronização automática dos filtros com a rota.
+- **Tailwind 4 + design tokens internos**: facilitar consistência visual em dark mode.
+- **Vitest + Testing Library**: feedback rápido em nível de componente, com mocks de browser (`jsdom`).
+- **Query strings como fonte única da verdade**: compatível com compartilhamento de filtros e recarregamentos.
+
+---
+
+## 🆘 Troubleshooting
+
+| Sintoma                                        | Possível causa / solução                                                      |
+|-----------------------------------------------|-------------------------------------------------------------------------------|
+| `npm run dev` não encontra a API               | Certifique-se de que `NEXT_PUBLIC_DIRECTUS_URL` aponta para o Directus rodando |
+| Erro de autenticação na API                    | Gere um novo Static Token e atualize `NEXT_PUBLIC_DIRECTUS_TOKEN`             |
+| Seeds não carregaram                           | Derrube os containers (`down -v`) e suba novamente para reaplicar o `seed.sql`|
+| Porta 8055 ocupada                             | Ajuste `PORT`/`PUBLIC_URL` em `directus/.env` e mapeamento em `docker-compose.yml` |
+
+---
 
 ## 🏁 Conclusão
 
-O projeto Leapy Talents cumpre integralmente os requisitos do desafio:
+Com este guia você consegue:
 
-- ✅ Busca com debounce.
-- ✅ Filtros completos e persistentes.
-- ✅ Paginação server-side.
-- ✅ Ordenação por `date_updated` DESC.
-- ✅ Tratamento de estados vazios e erros.
-- ✅ Layout responsivo e moderno.
-- ✅ Testes unitários com Vitest.
-- ✅ Documentação completa de execução (back + front).
+1. Subir o ecossistema Directus + PostgreSQL (com dados prontos).
+2. Configurar o frontend Next.js com as variáveis adequadas.
+3. Executar a aplicação em desenvolvimento e rodar os testes.
 
-💬 Desenvolvido por Warley Vieira  
-Teste técnico — Desafio “Interface de Talentos”
+💬 Desenvolvido por **Warley Vieira** — Teste técnico “Interface de Talentos”.

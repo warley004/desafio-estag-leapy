@@ -1,0 +1,5 @@
+# Environment overrides
+/directus/.env
+/directus/.env.local
+/web/.env
+/web/.env.local
