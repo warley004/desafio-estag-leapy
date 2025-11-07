@@ -146,7 +146,7 @@ cd desafio-estag-leapy/01-interface-talent
 	 ```
 3. Aguarde a inicialização. As migrations (`schema.sql`) e seeds (`seed.sql`) são aplicadas automaticamente na primeira subida.
 4. Acesse [http://localhost:8055](http://localhost:8055) e crie o primeiro usuário administrador (caso solicitado).
-5. Após logado, gere um **Static Token** (Settings → Access Control → Admin → Tokens) e guarde o valor para o frontend.
+5. Após logado, gere um **Static Token** (User Directory → Administrator → Admin User → Token) e guarde o valor para o frontend.
 
 > Para derrubar os serviços, execute `docker compose -f directus/docker-compose.yml down`.
 
