@@ -106,7 +106,6 @@ export default function FiltersSidebar({
       <div className="flex items-center gap-2 mb-4">
         {/* Imagem da logo */}
         
-          {/* Troque o caminho abaixo pela sua imagem real */}
           <img
             src="/images/LeapyLogo.png"
             width={110}
@@ -166,7 +165,6 @@ export default function FiltersSidebar({
 
           <DateRangePicker startDate={startDate} endDate={endDate} />
 
-          {/* linkzinho pra limpar só o período */}
           <a
             href={clearPeriodHref}
             className="text-[11px] text-gray-400 hover:text-gray-200 underline mt-1 inline-block"
