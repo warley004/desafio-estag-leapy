@@ -1,3 +1,64 @@
+import CustomSelect, { type SelectOption } from "@/components/CustomSelect";
+
+const departmentOptions: SelectOption[] = [
+  { value: "", label: "Todos" },
+  { value: "Engineering", label: "Engineering" },
+  { value: "Design", label: "Design" },
+  { value: "Marketing", label: "Marketing" },
+  { value: "Product", label: "Product" },
+  { value: "Operations", label: "Operations" },
+];
+
+const statusOptions: SelectOption[] = [
+  { value: "", label: "Todos" },
+  { value: "ACTIVE", label: "ACTIVE" },
+  { value: "INACTIVE", label: "INACTIVE" },
+  { value: "ONBOARDING", label: "ONBOARDING" },
+];
+
+const orchestratorOptions: SelectOption[] = [
+  { value: "", label: "Todos" },
+  { value: "ONBOARDING", label: "ONBOARDING" },
+  { value: "PENDING_FIRST_ACCESS", label: "PENDING_FIRST_ACCESS" },
+  { value: "COMPLETED", label: "COMPLETED" },
+];
+
+const leaderOptions: SelectOption[] = [
+  { value: "", label: "Todos" },
+  { value: "11", label: "Ines Freitas", group: "Design" },
+  { value: "16", label: "Marina Costa", group: "Design" },
+  { value: "6", label: "Thiago Cardoso", group: "Design" },
+  { value: "1", label: "João Mendes", group: "Design" },
+  { value: "5", label: "Luiza Freitas", group: "Engineering" },
+  { value: "15", label: "Ines Mendes", group: "Engineering" },
+  { value: "20", label: "João Mendes", group: "Engineering" },
+  { value: "10", label: "Patrícia Mendes", group: "Engineering" },
+  { value: "13", label: "Camila Freitas", group: "Marketing" },
+  { value: "3", label: "Lucas Araujo", group: "Marketing" },
+  { value: "8", label: "Luiza Silva", group: "Marketing" },
+  { value: "18", label: "Francisco Ferreira", group: "Marketing" },
+  { value: "4", label: "Francisco Nunes", group: "Operations" },
+  { value: "14", label: "Marina Araujo", group: "Operations" },
+  { value: "19", label: "Marina Ferreira", group: "Operations" },
+  { value: "9", label: "Patrícia Cardoso", group: "Operations" },
+  { value: "2", label: "Marina Ferreira", group: "Product" },
+  { value: "12", label: "Marina Cardoso", group: "Product" },
+  { value: "7", label: "Rafael Mendes", group: "Product" },
+];
+
+const roleOptions: SelectOption[] = [
+  { value: "", label: "Todos" },
+  { value: "1", label: "Frontend Developer" },
+  { value: "2", label: "Backend Developer" },
+  { value: "3", label: "Fullstack Developer" },
+  { value: "4", label: "Product Manager" },
+  { value: "5", label: "Data Analyst" },
+  { value: "6", label: "DevOps Engineer" },
+  { value: "7", label: "QA Engineer" },
+  { value: "8", label: "UX Designer" },
+  { value: "9", label: "Mobile Developer" },
+  { value: "10", label: "Machine Learning Engineer" },
+];
 
 type FiltersSidebarProps = {
   department?: string;
@@ -64,18 +125,12 @@ export default function FiltersSidebar({
           <label className="text-xs font-medium text-gray-400">
             Departamento
           </label>
-          <select
+          <CustomSelect
             name="department"
-            defaultValue={department ?? ""}
-            className="w-full bg-[#14161a] border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-violet-500"
-          >
-            <option value="">Todos</option>
-            <option value="Engineering">Engineering</option>
-            <option value="Design">Design</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Product">Product</option>
-            <option value="Operations">Operations</option>
-          </select>
+            options={departmentOptions}
+            value={department ?? ""}
+            ariaLabel="Selecionar departamento"
+          />
         </div>
 
         {/* Current Status */}
@@ -83,16 +138,12 @@ export default function FiltersSidebar({
           <label className="text-xs font-medium text-gray-400">
             Status
           </label>
-          <select
+          <CustomSelect
             name="status"
-            defaultValue={status ?? ""}
-            className="w-full bg-[#14161a] border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-violet-500"
-          >
-            <option value="">Todos</option>
-            <option value="ACTIVE">ACTIVE</option>
-            <option value="INACTIVE">INACTIVE</option>
-            <option value="ONBOARDING">ONBOARDING</option>
-          </select>
+            options={statusOptions}
+            value={status ?? ""}
+            ariaLabel="Selecionar status"
+          />
         </div>
 
         {/* Orchestrator State */}
@@ -100,18 +151,12 @@ export default function FiltersSidebar({
           <label className="text-xs font-medium text-gray-400">
             Orchestrator State
           </label>
-          <select
+          <CustomSelect
             name="orchestrator"
-            defaultValue={orchestratorState ?? ""}
-            className="w-full bg-[#14161a] border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-violet-500"
-          >
-            <option value="">Todos</option>
-            <option value="ONBOARDING">ONBOARDING</option>
-            <option value="PENDING_FIRST_ACCESS">
-              PENDING_FIRST_ACCESS
-            </option>
-            <option value="COMPLETED">COMPLETED</option>
-          </select>
+            options={orchestratorOptions}
+            value={orchestratorState ?? ""}
+            ariaLabel="Selecionar orchestrator state"
+          />
         </div>
 
         {/* Período */}
@@ -146,70 +191,23 @@ export default function FiltersSidebar({
         {/* Leader */}
         <div className="space-y-1">
           <label className="text-xs font-medium text-gray-400">Liderança</label>
-          <select
+          <CustomSelect
             name="leader"
-            defaultValue={leaderId != null ? String(leaderId) : ""}
-            className="w-full bg-[#14161a] border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-violet-500"
-          >
-            <option value="">Todos</option>
-
-            <optgroup label="Design">
-              <option value="11">Ines Freitas</option>
-              <option value="16">Marina Costa</option>
-              <option value="6">Thiago Cardoso</option>
-              <option value="1">João Mendes</option>
-            </optgroup>
-
-            <optgroup label="Engineering">
-              <option value="5">Luiza Freitas</option>
-              <option value="15">Ines Mendes</option>
-              <option value="20">João Mendes</option>
-              <option value="10">Patrícia Mendes</option>
-            </optgroup>
-
-            <optgroup label="Marketing">
-              <option value="13">Camila Freitas</option>
-              <option value="3">Lucas Araujo</option>
-              <option value="8">Luiza Silva</option>
-              <option value="18">Francisco Ferreira</option>
-            </optgroup>
-
-            <optgroup label="Operations">
-              <option value="4">Francisco Nunes</option>
-              <option value="14">Marina Araujo</option>
-              <option value="19">Marina Ferreira</option>
-              <option value="9">Patrícia Cardoso</option>
-            </optgroup>
-
-            <optgroup label="Product">
-              <option value="2">Marina Ferreira</option>
-              <option value="12">Marina Cardoso</option>
-              <option value="7">Rafael Mendes</option>
-            </optgroup>
-          </select>
+            options={leaderOptions}
+            value={leaderId != null ? String(leaderId) : ""}
+            ariaLabel="Selecionar liderança"
+          />
         </div>
 
         {/* Cargo */}
         <div className="space-y-1">
           <label className="text-xs font-medium text-gray-400">Cargo</label>
-          <select
+          <CustomSelect
             name="role"
-            defaultValue={targetRoleId != null ? String(targetRoleId) : ""}
-            className="w-full bg-[#14161a] border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-violet-500"
-          >
-            <option value="">Todos</option>
-            {/* Ajuste os IDs / títulos conforme target_roles */}
-            <option value="1">Frontend Developer</option>
-            <option value="2">Backend Developer</option>
-            <option value="3">Fullstack Developer</option>
-            <option value="4">Product Manager</option>
-            <option value="5">Data Analyst</option>
-            <option value="6">DevOps Engineer</option>
-            <option value="7">QA Engineer</option>
-            <option value="8">UX Designer</option>
-            <option value="9">Mobile Developer</option>
-            <option value="10">Machine Learning Engineer</option>
-          </select>
+            options={roleOptions}
+            value={targetRoleId != null ? String(targetRoleId) : ""}
+            ariaLabel="Selecionar cargo"
+          />
         </div>
 
         {/* PDI Pronto – toggle */}
