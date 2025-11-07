@@ -115,7 +115,7 @@ export default async function Page({
   return (
     <div className="flex h-screen w-full">
       {/* Sidebar rolável */}
-      <aside className="w-80 bg-[#111217] border-r border-gray-800 overflow-y-auto">
+  <aside className="w-80 bg-[#111217] border-r border-gray-800 overflow-y-auto sidebar-scroll">
         <FiltersSidebar
           department={department}
           status={status}

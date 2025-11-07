@@ -24,3 +24,27 @@ body {
   color: var(--foreground);
   font-family: "Nunito Sans", Arial, Helvetica, sans-serif;
 }
+
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, rgba(18, 19, 25, 0.6) 0%, rgba(27, 29, 33, 0.2) 100%);
+  border-radius: 9999px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
+  border-radius: 9999px;
+  border: 2px solid rgba(17, 18, 23, 0.95);
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #a855f7 0%, #7c3aed 100%);
+}
