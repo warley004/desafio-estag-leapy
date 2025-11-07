@@ -160,7 +160,7 @@ export default async function Page({
         </div>
 
         {/* PAGINAÇÃO */}
-        <footer className="mt-8 flex justify-between text-gray-500 text-sm">
+        <footer className="mt-8 mb-6 flex justify-between text-gray-500 text-sm">
           <span>
             Página {page} de {totalPages}
           </span>
