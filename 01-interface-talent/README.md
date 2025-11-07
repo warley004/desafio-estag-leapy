@@ -186,7 +186,7 @@ cd desafio-estag-leapy/01-interface-talent
 
 - **Build de produção:**
 	```sh
-	npm run build
+	npm run build teste
 	```
 
 > Todos os scripts devem ser executados dentro da pasta `web`.
