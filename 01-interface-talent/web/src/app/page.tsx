@@ -79,7 +79,7 @@ export default async function Page({
       ? Math.max(1, Number(pageParam))
       : 1;
 
-  const limit = 8;
+  const limit = 4;
 
   const { talents, total } = await fetchTalentsPage({
     page,
@@ -113,22 +113,25 @@ export default async function Page({
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* SIDEBAR COM FILTROS */}
-      <FiltersSidebar
-        department={department}
-        status={status}
-        orchestratorState={orchestratorState}
-        startDate={startDate}
-        endDate={endDate}
-        leaderId={leaderId ?? null}
-        targetRoleId={targetRoleId ?? null}
-        pdiReady={pdiReady}
-      />
+    <div className="flex h-screen w-full">
+      {/* Sidebar rolável */}
+      <aside className="w-80 bg-[#111217] border-r border-gray-800 overflow-y-auto">
+        <FiltersSidebar
+          department={department}
+          status={status}
+          orchestratorState={orchestratorState}
+          startDate={startDate}
+          endDate={endDate}
+          leaderId={leaderId}
+          targetRoleId={targetRoleId}
+          pdiReady={pdiReady}
+        />
+      </aside>
 
       {/* CONTEÚDO PRINCIPAL */}
-      <section className="flex-1 px-8 py-8">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+  <section className="flex-1 w-full px-8 py-8 flex flex-col">
+        {/* HEADER */}
+        <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl font-semibold">Talentos</h1>
             <p className="text-gray-400 text-sm">
@@ -136,24 +139,28 @@ export default async function Page({
             </p>
           </div>
 
-          <div className="w-full md:w-72">
+          <div className="w-72">
             <EmailSearchInput />
           </div>
         </header>
 
-        {talents.length === 0 ? (
-          <p className="text-gray-400 text-sm">
-            Nenhum talento encontrado para os filtros atuais.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {talents.map((t) => (
-              <TalentCard key={t.id} talent={t} />
-            ))}
-          </div>
-        )}
+        {/* GRID + espaço central */}
+        <div className="flex-1">
+          {talents.length === 0 ? (
+            <p className="text-gray-400 text-sm">
+              Nenhum talento encontrado para os filtros atuais.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+              {talents.map((t) => (
+                <TalentCard key={t.id} talent={t} />
+              ))}
+            </div>
+          )}
+        </div>
 
-        <footer className="mt-8 flex items-center justify-between text-gray-500 text-sm">
+        {/* PAGINAÇÃO */}
+        <footer className="mt-8 flex justify-between text-gray-500 text-sm">
           <span>
             Página {page} de {totalPages}
           </span>

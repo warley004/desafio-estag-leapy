@@ -38,7 +38,7 @@ export default function FiltersSidebar({
       : "/";
 
   return (
-    <aside className="w-full max-w-xs bg-[#111217] border-r border-gray-800 px-5 py-6 flex flex-col gap-6">
+    <aside className="w-full max-w-xs bg-[#111217] border-r border-gray-800 px-5 py-6 flex flex-col gap-6 h-screen overflow-y-auto">
 
       {/* 🔹 HEADER COM LOGO E TÍTULO */}
       <div className="flex items-center gap-2 mb-4">

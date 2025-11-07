@@ -48,7 +48,7 @@ export default function TalentCard({ talent }: { talent: TalentWithUser }) {
       : "Não definido";
 
   return (
-    <div className="bg-[#1b1d21] rounded-2xl p-5 shadow hover:shadow-lg transition flex flex-col gap-4">
+    <div className="w-full h-full bg-[#1b1d21] rounded-2xl p-5 shadow hover:shadow-lg transition flex flex-col gap-4">
       {/* Top row: avatar, name, email, status */}
       <div className="flex items-center gap-4">
         {/* Avatar */}
