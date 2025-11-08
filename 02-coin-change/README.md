@@ -80,7 +80,7 @@ echo '{ "coins": [1, 2, 5], "amount": 11 }' | docker run -i coin-change
 
 ### 🧪 Casos de Teste
 
-Todos os casos fornecidos em `tests/cases.json` foram executados e aprovados com sucesso ✅
+Todos os casos fornecidos em `tests/cases.json` foram executados e aprovados com sucesso (o arquivo também conta com mais cinco testes implementados, além aqueles que já vieram por padrão).
 
 ---
 
