@@ -1,47 +1,89 @@
-# Desafio 02 — Coin Change
+# 🪙 Desafio 02 — Coin Change
 
-Implemente uma solução para o problema de Coin Change. Linguagem livre, mas você deve fornecer um `Dockerfile` e um `runner.yml` descrevendo como executar sua solução via CLI.
+## 📘 Descrição
 
-## Contrato de I/O (obrigatório)
+Este desafio implementa a solução para o problema **Coin Change**, que consiste em determinar o menor número de moedas necessário para somar um determinado valor (`amount`), a partir de uma lista de denominações (`coins`).
 
-- Entrada (stdin) JSON: `{ "coins": number[], "amount": number }`
-- Saída (stdout) JSON: `{ "minCoins": number }`
+A solução foi desenvolvida em **Node.js**, seguindo o contrato de entrada/saída especificado, com suporte a execução via **Docker** e **runner.yml**.
 
-Exemplo:
+---
 
-```json
-{ "coins": [1, 2, 5], "amount": 11 }
+## 🧠 Lógica da Solução
+
+A abordagem utiliza **Programação Dinâmica (Bottom-Up)**.
+
+- Um vetor `dp` de tamanho `amount + 1` é criado, onde `dp[i]` representa o número mínimo de moedas necessárias para formar o valor `i`.
+- Inicialmente, `dp[0] = 0` (zero moedas para formar zero).
+- Para cada moeda disponível, o algoritmo percorre todos os valores possíveis até `amount`, atualizando `dp[a]` com o menor número possível de moedas.
+
+### 🧩 Pseudocódigo Simplificado
+
+```javascript
+dp[0] = 0
+para cada moeda c:
+  para a de c até amount:
+    dp[a] = min(dp[a], dp[a - c] + 1)
 ```
 
-```json
-{ "minCoins": 3 }
-```
+### ⚙️ Complexidade
 
-## Como rodar os testes
+| Tipo  | Valor         |
+|-------|--------------|
+| Tempo | O(n × amount) |
+| Espaço| O(amount)     |
 
-Localmente:
+---
+
+## ⚙️ Execução Local
+
+### 1️⃣ Rodar localmente (sem Docker)
 
 ```bash
 npm install
 npm test
 ```
 
-No CI (GitHub Actions) os testes serão executados automaticamente ao abrir o PR.
+### 2️⃣ Executar manualmente
 
-## Requisitos
+```bash
+echo '{ "coins": [1, 2, 5], "amount": 11 }' | node index.js
+# Saída: {"minCoins":3}
+```
 
-- Fornecer `Dockerfile` que constrói uma imagem capaz de executar o comando definido em `runner.yml`.
-- Manter o contrato de I/O e saída estritamente conforme descrito.
-- Opcional: testes próprios adicionais e documentação.
+### 🐳 Execução via Docker
 
-## Arquivos fornecidos
+#### 🧱 Build da imagem
 
-- `tests/cases.json` — casos de teste oficiais
-- `tests/harness.js` — test runner genérico
-- `runner.yml` — contrato do comando de execução
+```bash
+docker build -t coin-change .
+```
 
-## Observações importantes
+#### ▶️ Rodar o container
 
-- Você deve propor e implementar sua própria solução. Nenhum código de solução está incluído neste repositório.
-- Garanta que sua solução siga o contrato de I/O descrito acima.
-- O `Dockerfile` deve ser capaz de construir uma imagem que execute o comando definido em `runner.yml`.
+```bash
+echo '{ "coins": [1, 2, 5], "amount": 11 }' | docker run -i coin-change
+# Saída: {"minCoins":3}
+```
+
+### 📂 Estrutura do Projeto
+
+```plaintext
+02-coin-change/
+├── index.js          # Implementação principal
+├── runner.yml        # Comando padrão para execução
+├── Dockerfile        # Imagem configurada para execução via CLI
+├── package.json
+└── tests/
+    ├── harness.js
+    └── cases.json
+```
+
+### 🧪 Casos de Teste
+
+Todos os casos fornecidos em `tests/cases.json` foram executados e aprovados com sucesso ✅
+
+---
+
+✨ **Autor**
+
+Desenvolvido por Warley Vieira — 2025
